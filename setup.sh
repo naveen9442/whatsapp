@@ -102,11 +102,13 @@ echo -e "${YELLOW}Note: Seed already populated or completed during migration.${N
 
 # 7. Final instructions
 SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "localhost")
+HTTP_PORT=$(grep -E '^HTTP_PORT=' .env 2>/dev/null | cut -d '=' -f 2 || echo "300")
+HTTP_PORT=${HTTP_PORT:-300}
 
 echo -e "\n${GREEN}====================================================${NC}"
 echo -e "${GREEN}   DEPLOYMENT COMPLETE & RUNNING!                   ${NC}"
 echo -e "${GREEN}====================================================${NC}"
-echo -e "Dashboard URL: ${BLUE}http://${SERVER_IP}/${NC}"
+echo -e "Dashboard URL: ${BLUE}http://${SERVER_IP}:${HTTP_PORT}/${NC}"
 echo -e "Admin Login:   ${YELLOW}admin@demo.com${NC}  | Password: ${YELLOW}admin123${NC}"
 echo -e "Viewer Login:  ${YELLOW}viewer@demo.com${NC} | Password: ${YELLOW}viewer123${NC}"
 echo -e "\nUseful commands:"

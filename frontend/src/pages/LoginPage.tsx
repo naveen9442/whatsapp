@@ -82,16 +82,20 @@ export const LoginPage: React.FC = () => {
         <div className="bg-gray-900/95 rounded-3xl p-8 sm:p-10 border border-gray-800 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
           {/* HALOOCOM + WhatsApp Brand Logos */}
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="inline-flex items-center gap-3.5 bg-white px-5 py-3 rounded-2xl shadow-[0_0_35px_rgba(37,99,235,0.25)] border border-blue-500/30 mb-4">
-              <img
-                src="/haloocom-logo.png"
-                alt="HALOOCOM"
-                className="h-11 w-auto object-contain"
-              />
-              <div className="h-8 w-px bg-gray-200" />
-              <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center text-white shadow-sm shrink-0">
+            <div className="relative inline-block mb-4">
+              {/* White container for HALOOCOM Logo */}
+              <div className="w-24 h-24 rounded-3xl bg-white p-3 shadow-[0_0_35px_rgba(37,99,235,0.3)] flex items-center justify-center border border-blue-500/30">
+                <img
+                  src="/haloocom-logo.png"
+                  alt="HALOOCOM"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              {/* WhatsApp round badge overlapping at bottom right corner */}
+              <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-full bg-[#25D366] border-2 border-gray-900 flex items-center justify-center text-white shadow-lg">
                 <svg
-                  className="w-6 h-6 fill-current"
+                  className="w-5 h-5 fill-current"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.37C9.35 7.37 9.06 7.44 8.81 7.71C8.56 7.98 7.86 8.64 7.86 9.97C7.86 11.3 8.83 12.58 8.97 12.77C9.11 12.96 10.87 15.68 13.61 16.86C14.26 17.14 14.77 17.31 15.17 17.44C15.83 17.65 16.42 17.62 16.9 17.55C17.43 17.47 18.54 16.88 18.77 16.23C19 15.58 19 15.03 18.93 14.91C18.86 14.79 18.68 14.72 18.42 14.59C18.15 14.46 16.83 13.81 16.59 13.72C16.34 13.63 16.16 13.59 15.98 13.86C15.8 14.13 15.28 14.74 15.12 14.92C14.96 15.11 14.81 15.13 14.54 15C14.28 14.87 13.42 14.59 12.4 13.68C11.61 12.97 11.07 12.09 10.92 11.83C10.77 11.56 10.9 11.42 11.03 11.29C11.15 11.17 11.3 10.97 11.44 10.81C11.58 10.65 11.63 10.53 11.72 10.35C11.81 10.16 11.77 10.01 11.7 9.88C11.63 9.75 11.06 8.35 10.82 7.78C10.59 7.22 10.36 7.3 10.19 7.29C10.02 7.29 9.82 7.37 9.53 7.37Z" />

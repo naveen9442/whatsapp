@@ -41,6 +41,9 @@ let DashboardController = class DashboardController {
     async getPendingLinks(user, query) {
         return this.dashboardService.getPendingLinks(user.tenantId, query);
     }
+    async getReportsSummary(user, query) {
+        return this.dashboardService.getReportsSummary(user.tenantId, query);
+    }
     async exportCsv(user, type, query, res) {
         if (!type || !['payments', 'links'].includes(type)) {
             throw new common_1.BadRequestException('Type must be either "payments" or "links"');
@@ -107,6 +110,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, dashboard_query_dto_1.DashboardQueryDto]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getPendingLinks", null);
+__decorate([
+    (0, common_1.Get)('reports/summary'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get executive reporting summary and analytics' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, dashboard_query_dto_1.DashboardQueryDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getReportsSummary", null);
 __decorate([
     (0, common_1.Get)('export/csv'),
     (0, swagger_1.ApiOperation)({ summary: 'Export payments or payment links as CSV' }),

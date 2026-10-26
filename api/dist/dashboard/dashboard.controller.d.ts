@@ -141,5 +141,57 @@ export declare class DashboardController {
             totalPages: number;
         };
     }>;
+    getReportsSummary(user: any, query: DashboardQueryDto): Promise<{
+        period: string;
+        kpis: {
+            avgTicketSize: number;
+            recoveryRate: number;
+            messagesSent: number;
+            delivered: number;
+            read: number;
+            failed: number;
+            replies: number;
+            linksShared: number;
+            paymentsReceived: number;
+            amountReceived: number;
+            replyRate: number;
+            conversionRate: number;
+            deliveryRate: number;
+            readRate: number;
+        };
+        agingBuckets: {
+            bracket: string;
+            amount: number;
+            count: number;
+            risk: string;
+        }[];
+        revenueTrend: {
+            date: string;
+            messagesSent: number;
+            delivered: number;
+            read: number;
+            failed: number;
+            replies: number;
+            linksShared: number;
+            paymentsReceived: number;
+            amountReceived: number;
+        }[];
+        agentPerformance: {
+            agentId: string;
+            agentName: string;
+            phone: string;
+            messagesSent: number;
+            delivered: number;
+            read: number;
+            failed: number;
+            replies: number;
+            replyRate: number;
+            linksShared: number;
+            paymentsReceived: number;
+            amountReceived: number;
+            conversionRate: number;
+        }[];
+        generatedAt: string;
+    }>;
     exportCsv(user: any, type: 'payments' | 'links', query: DashboardQueryDto, res: Response): Promise<Response<any, Record<string, any>>>;
 }
