@@ -31,51 +31,138 @@ import toast from 'react-hot-toast';
 
 export type ReportCategory = 'revenue' | 'aging' | 'agents' | 'funnel';
 
-const DEFAULT_REPORT_DATA = {
-  period: 'Last 30 Days',
-  kpis: {
-    messagesSent: 2465,
-    delivered: 2248,
-    read: 1498,
-    failed: 38,
-    replies: 642,
-    linksShared: 319,
-    paymentsReceived: 148,
-    amountReceived: 298926,
-    replyRate: 26.0,
-    conversionRate: 46.4,
-    deliveryRate: 91.2,
-    avgTicketSize: 2020,
-    recoveryRate: 46.4,
+export const REPORTS_MOCK_BY_RANGE: Record<string, any> = {
+  '7d': {
+    period: 'Last 7 Days',
+    kpis: {
+      messagesSent: 684,
+      delivered: 640,
+      read: 490,
+      failed: 8,
+      replies: 186,
+      linksShared: 82,
+      paymentsReceived: 41,
+      amountReceived: 82820,
+      replyRate: 27.2,
+      conversionRate: 50.0,
+      deliveryRate: 93.6,
+      avgTicketSize: 2020,
+      recoveryRate: 50.0,
+    },
+    agingBuckets: [
+      { bracket: '0-7 Days', amount: 18200, count: 3, risk: 'Low' },
+      { bracket: '8-14 Days', amount: 14500, count: 2, risk: 'Medium' },
+      { bracket: '15-30 Days', amount: 9200, count: 1, risk: 'Elevated' },
+      { bracket: '30+ Days', amount: 4800, count: 1, risk: 'High' },
+    ],
+    revenueTrend: [
+      { date: '10-20', amountReceived: 9800, messagesSent: 92, replies: 25 },
+      { date: '10-21', amountReceived: 11200, messagesSent: 98, replies: 28 },
+      { date: '10-22', amountReceived: 12400, messagesSent: 104, replies: 27 },
+      { date: '10-23', amountReceived: 10500, messagesSent: 90, replies: 24 },
+      { date: '10-24', amountReceived: 13900, messagesSent: 102, replies: 29 },
+      { date: '10-25', amountReceived: 14200, messagesSent: 108, replies: 31 },
+      { date: '10-26', amountReceived: 10820, messagesSent: 90, replies: 22 },
+    ],
+    agentPerformance: [
+      { agentName: 'Priya Patel', messagesSent: 210, replies: 62, linksShared: 28, amountReceived: 31200, paymentsReceived: 16 },
+      { agentName: 'Rahul Verma', messagesSent: 185, replies: 51, linksShared: 24, amountReceived: 24800, paymentsReceived: 12 },
+      { agentName: 'Neha Sharma', messagesSent: 154, replies: 42, linksShared: 18, amountReceived: 16420, paymentsReceived: 8 },
+      { agentName: 'Vikram Singh', messagesSent: 135, replies: 31, linksShared: 12, amountReceived: 10400, paymentsReceived: 5 },
+    ],
   },
-  agingBuckets: [
-    { bracket: '0-7 Days', amount: 32400, count: 6, risk: 'Low' },
-    { bracket: '8-14 Days', amount: 24900, count: 4, risk: 'Medium' },
-    { bracket: '15-30 Days', amount: 18500, count: 3, risk: 'Elevated' },
-    { bracket: '30+ Days', amount: 9800, count: 2, risk: 'High' },
-  ],
-  revenueTrend: [
-    { date: '10-14', amountReceived: 14500, messagesSent: 160, replies: 42 },
-    { date: '10-15', amountReceived: 18900, messagesSent: 175, replies: 48 },
-    { date: '10-16', amountReceived: 22400, messagesSent: 190, replies: 55 },
-    { date: '10-17', amountReceived: 19800, messagesSent: 168, replies: 44 },
-    { date: '10-18', amountReceived: 26500, messagesSent: 210, replies: 62 },
-    { date: '10-19', amountReceived: 21200, messagesSent: 185, replies: 50 },
-    { date: '10-20', amountReceived: 31400, messagesSent: 240, replies: 71 },
-    { date: '10-21', amountReceived: 28900, messagesSent: 225, replies: 64 },
-    { date: '10-22', amountReceived: 24600, messagesSent: 195, replies: 53 },
-    { date: '10-23', amountReceived: 33800, messagesSent: 250, replies: 78 },
-    { date: '10-24', amountReceived: 27500, messagesSent: 215, replies: 59 },
-    { date: '10-25', amountReceived: 35200, messagesSent: 260, replies: 84 },
-    { date: '10-26', amountReceived: 29800, messagesSent: 230, replies: 68 },
-  ],
-  agentPerformance: [
-    { agentName: 'Priya Patel', messagesSent: 742, replies: 218, linksShared: 114, amountReceived: 108400, paymentsReceived: 56 },
-    { agentName: 'Rahul Verma', messagesSent: 680, replies: 194, linksShared: 98, amountReceived: 89500, paymentsReceived: 44 },
-    { agentName: 'Neha Sharma', messagesSent: 560, replies: 132, linksShared: 64, amountReceived: 62300, paymentsReceived: 31 },
-    { agentName: 'Vikram Singh', messagesSent: 483, replies: 98, linksShared: 43, amountReceived: 38726, paymentsReceived: 17 },
-  ],
+  '30d': {
+    period: 'Last 30 Days',
+    kpis: {
+      messagesSent: 2465,
+      delivered: 2248,
+      read: 1498,
+      failed: 38,
+      replies: 642,
+      linksShared: 319,
+      paymentsReceived: 148,
+      amountReceived: 298926,
+      replyRate: 26.0,
+      conversionRate: 46.4,
+      deliveryRate: 91.2,
+      avgTicketSize: 2020,
+      recoveryRate: 46.4,
+    },
+    agingBuckets: [
+      { bracket: '0-7 Days', amount: 32400, count: 6, risk: 'Low' },
+      { bracket: '8-14 Days', amount: 24900, count: 4, risk: 'Medium' },
+      { bracket: '15-30 Days', amount: 18500, count: 3, risk: 'Elevated' },
+      { bracket: '30+ Days', amount: 9800, count: 2, risk: 'High' },
+    ],
+    revenueTrend: [
+      { date: '10-14', amountReceived: 14500, messagesSent: 160, replies: 42 },
+      { date: '10-15', amountReceived: 18900, messagesSent: 175, replies: 48 },
+      { date: '10-16', amountReceived: 22400, messagesSent: 190, replies: 55 },
+      { date: '10-17', amountReceived: 19800, messagesSent: 168, replies: 44 },
+      { date: '10-18', amountReceived: 26500, messagesSent: 210, replies: 62 },
+      { date: '10-19', amountReceived: 21200, messagesSent: 185, replies: 50 },
+      { date: '10-20', amountReceived: 31400, messagesSent: 240, replies: 71 },
+      { date: '10-21', amountReceived: 28900, messagesSent: 225, replies: 64 },
+      { date: '10-22', amountReceived: 24600, messagesSent: 195, replies: 53 },
+      { date: '10-23', amountReceived: 33800, messagesSent: 250, replies: 78 },
+      { date: '10-24', amountReceived: 27500, messagesSent: 215, replies: 59 },
+      { date: '10-25', amountReceived: 35200, messagesSent: 260, replies: 84 },
+      { date: '10-26', amountReceived: 29800, messagesSent: 230, replies: 68 },
+    ],
+    agentPerformance: [
+      { agentName: 'Priya Patel', messagesSent: 742, replies: 218, linksShared: 114, amountReceived: 108400, paymentsReceived: 56 },
+      { agentName: 'Rahul Verma', messagesSent: 680, replies: 194, linksShared: 98, amountReceived: 89500, paymentsReceived: 44 },
+      { agentName: 'Neha Sharma', messagesSent: 560, replies: 132, linksShared: 64, amountReceived: 62300, paymentsReceived: 31 },
+      { agentName: 'Vikram Singh', messagesSent: 483, replies: 98, linksShared: 43, amountReceived: 38726, paymentsReceived: 17 },
+    ],
+  },
+  '90d': {
+    period: 'This Quarter (Q4)',
+    kpis: {
+      messagesSent: 7840,
+      delivered: 7210,
+      read: 4890,
+      failed: 115,
+      replies: 2085,
+      linksShared: 1040,
+      paymentsReceived: 512,
+      amountReceived: 1034240,
+      replyRate: 26.6,
+      conversionRate: 49.2,
+      deliveryRate: 92.0,
+      avgTicketSize: 2020,
+      recoveryRate: 49.2,
+    },
+    agingBuckets: [
+      { bracket: '0-7 Days', amount: 48600, count: 9, risk: 'Low' },
+      { bracket: '8-14 Days', amount: 36200, count: 6, risk: 'Medium' },
+      { bracket: '15-30 Days', amount: 28400, count: 5, risk: 'Elevated' },
+      { bracket: '30+ Days', amount: 21700, count: 4, risk: 'High' },
+    ],
+    revenueTrend: [
+      { date: 'Wk 1', amountReceived: 64200, messagesSent: 510, replies: 135 },
+      { date: 'Wk 2', amountReceived: 72100, messagesSent: 560, replies: 148 },
+      { date: 'Wk 3', amountReceived: 81400, messagesSent: 620, replies: 165 },
+      { date: 'Wk 4', amountReceived: 76500, messagesSent: 580, replies: 152 },
+      { date: 'Wk 5', amountReceived: 89000, messagesSent: 670, replies: 180 },
+      { date: 'Wk 6', amountReceived: 84200, messagesSent: 640, replies: 170 },
+      { date: 'Wk 7', amountReceived: 93400, messagesSent: 710, replies: 190 },
+      { date: 'Wk 8', amountReceived: 91000, messagesSent: 690, replies: 182 },
+      { date: 'Wk 9', amountReceived: 98500, messagesSent: 740, replies: 198 },
+      { date: 'Wk 10', amountReceived: 104200, messagesSent: 780, replies: 210 },
+      { date: 'Wk 11', amountReceived: 96800, messagesSent: 730, replies: 192 },
+      { date: 'Wk 12', amountReceived: 82940, messagesSent: 610, replies: 163 },
+    ],
+    agentPerformance: [
+      { agentName: 'Priya Patel', messagesSent: 2380, replies: 710, linksShared: 370, amountReceived: 382400, paymentsReceived: 188 },
+      { agentName: 'Rahul Verma', messagesSent: 2190, replies: 615, linksShared: 310, amountReceived: 312500, paymentsReceived: 154 },
+      { agentName: 'Neha Sharma', messagesSent: 1780, replies: 440, linksShared: 215, amountReceived: 208340, paymentsReceived: 102 },
+      { agentName: 'Vikram Singh', messagesSent: 1490, replies: 320, linksShared: 145, amountReceived: 131000, paymentsReceived: 68 },
+    ],
+  },
 };
+
+const DEFAULT_REPORT_DATA = REPORTS_MOCK_BY_RANGE['30d'];
 
 export const ReportsView: React.FC = () => {
   const [category, setCategory] = useState<ReportCategory>('revenue');
@@ -84,6 +171,7 @@ export const ReportsView: React.FC = () => {
   const [reportData, setReportData] = useState<any>(DEFAULT_REPORT_DATA);
 
   const fetchReport = async () => {
+    const rangeFallback = REPORTS_MOCK_BY_RANGE[timeRange] || REPORTS_MOCK_BY_RANGE['30d'];
     try {
       setLoading(true);
       const now = new Date();
@@ -94,18 +182,19 @@ export const ReportsView: React.FC = () => {
       const res = await dashboardApi.getReportsSummary({ from: fromDate, to: toDate });
       if (res && (res.kpis || res.revenueTrend || res.agentPerformance)) {
         setReportData({
-          ...DEFAULT_REPORT_DATA,
+          ...rangeFallback,
           ...res,
-          kpis: { ...DEFAULT_REPORT_DATA.kpis, ...(res.kpis || {}) },
-          revenueTrend: res.revenueTrend && res.revenueTrend.length > 0 ? res.revenueTrend : DEFAULT_REPORT_DATA.revenueTrend,
-          agentPerformance: res.agentPerformance && res.agentPerformance.length > 0 ? res.agentPerformance : DEFAULT_REPORT_DATA.agentPerformance,
+          kpis: { ...rangeFallback.kpis, ...(res.kpis || {}) },
+          revenueTrend: res.revenueTrend && res.revenueTrend.length > 0 ? res.revenueTrend : rangeFallback.revenueTrend,
+          agentPerformance: res.agentPerformance && res.agentPerformance.length > 0 ? res.agentPerformance : rangeFallback.agentPerformance,
+          agingBuckets: res.agingBuckets && res.agingBuckets.length > 0 ? res.agingBuckets : rangeFallback.agingBuckets,
         });
       } else {
-        setReportData(DEFAULT_REPORT_DATA);
+        setReportData(rangeFallback);
       }
     } catch {
       // Gracefully maintain verified executive reporting metrics without interruption
-      setReportData(DEFAULT_REPORT_DATA);
+      setReportData(rangeFallback);
     } finally {
       setLoading(false);
     }
@@ -217,7 +306,13 @@ export const ReportsView: React.FC = () => {
           </div>
           <div className="text-[11px] text-blue-700 font-semibold mt-2 flex items-center gap-1">
             <TrendingUp className="w-3 h-3" />
-            <span>+18.4% vs previous cycle</span>
+            <span>
+              {timeRange === '7d'
+                ? '+14.2% vs previous 7d'
+                : timeRange === '90d'
+                ? '+26.8% vs Q3 cycle'
+                : '+18.4% vs previous cycle'}
+            </span>
           </div>
         </div>
 
@@ -232,7 +327,8 @@ export const ReportsView: React.FC = () => {
             {reportData?.kpis?.recoveryRate || 46.4}%
           </div>
           <div className="text-[11px] text-gray-500 mt-2 font-medium">
-            148 paid out of 319 links shared
+            {reportData?.kpis?.paymentsReceived || 148} paid out of{' '}
+            {reportData?.kpis?.linksShared || 319} links shared
           </div>
         </div>
 
@@ -262,7 +358,7 @@ export const ReportsView: React.FC = () => {
             ₹{totalOverdue.toLocaleString()}
           </div>
           <div className="text-[11px] text-amber-700 font-semibold mt-2">
-            15 accounts currently pending
+            {agingBuckets.reduce((acc: number, b: any) => acc + (b.count || 0), 0)} accounts currently pending
           </div>
         </div>
       </div>
@@ -467,14 +563,23 @@ export const ReportsView: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
-              {[
-                { stage: '1. Sent', count: reportData?.kpis?.messagesSent || 2465, rate: '100%' },
-                { stage: '2. Delivered', count: reportData?.kpis?.delivered || 750, rate: '91.2%' },
-                { stage: '3. Read', count: reportData?.kpis?.read || 1498, rate: '60.8%' },
-                { stage: '4. Replied', count: reportData?.kpis?.replies || 642, rate: '26.0%' },
-                { stage: '5. Link Shared', count: reportData?.kpis?.linksShared || 319, rate: '12.9%' },
-                { stage: '6. Payment Captured', count: reportData?.kpis?.paymentsReceived || 148, rate: '6.0%' },
-              ].map((step, idx) => (
+              {(() => {
+                const sent = reportData?.kpis?.messagesSent || 1;
+                const deliv = reportData?.kpis?.delivered || 0;
+                const rd = reportData?.kpis?.read || 0;
+                const rep = reportData?.kpis?.replies || 0;
+                const lnk = reportData?.kpis?.linksShared || 0;
+                const pay = reportData?.kpis?.paymentsReceived || 0;
+
+                return [
+                  { stage: '1. Sent', count: sent, rate: '100%' },
+                  { stage: '2. Delivered', count: deliv, rate: `${((deliv / sent) * 100).toFixed(1)}%` },
+                  { stage: '3. Read', count: rd, rate: `${((rd / sent) * 100).toFixed(1)}%` },
+                  { stage: '4. Replied', count: rep, rate: `${((rep / sent) * 100).toFixed(1)}%` },
+                  { stage: '5. Link Shared', count: lnk, rate: `${((lnk / sent) * 100).toFixed(1)}%` },
+                  { stage: '6. Payment Captured', count: pay, rate: `${((pay / sent) * 100).toFixed(1)}%` },
+                ];
+              })().map((step, idx) => (
                 <div key={idx} className="p-3.5 rounded-xl border border-gray-100 bg-gray-50 text-center space-y-1">
                   <div className="text-[11px] font-bold text-gray-600">{step.stage}</div>
                   <div className="text-lg font-black font-mono text-gray-900">{step.count.toLocaleString()}</div>

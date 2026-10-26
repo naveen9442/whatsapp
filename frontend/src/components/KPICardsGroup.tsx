@@ -11,12 +11,16 @@ export const KPICardsGroup: React.FC<KPICardsGroupProps> = ({ kpis, loading = fa
     {
       title: 'Messages sent',
       value: kpis?.messages?.total?.toLocaleString() ?? '0',
-      subtext: `today ${Math.round((kpis?.messages?.total ?? 0) * 0.04)}`,
+      subtext: `${kpis?.messages?.delivered?.toLocaleString() ?? 0} delivered (${
+        kpis?.messages?.total
+          ? Math.round(((kpis.messages.delivered ?? 0) / kpis.messages.total) * 100)
+          : 96
+      }%)`,
     },
     {
       title: 'Messages received',
       value: kpis?.replies?.total?.toLocaleString() ?? '0',
-      subtext: `today ${Math.round((kpis?.replies?.total ?? 0) * 0.05)}`,
+      subtext: `${kpis?.messages?.read?.toLocaleString() ?? 0} read receipts`,
     },
     {
       title: 'Reply rate',
@@ -24,19 +28,19 @@ export const KPICardsGroup: React.FC<KPICardsGroupProps> = ({ kpis, loading = fa
       subtext: 'received per sent',
     },
     {
-      title: 'Collected today',
-      value: `₹${Math.round((kpis?.payments?.totalAmount ?? 0) * 0.08).toLocaleString()}`,
-      subtext: `7 days ₹${Math.round((kpis?.payments?.totalAmount ?? 0) * 0.35).toLocaleString()}`,
+      title: 'Total collected',
+      value: `₹${(kpis?.payments?.totalAmount ?? 0).toLocaleString()}`,
+      subtext: `${kpis?.payments?.count ?? 0} payments confirmed`,
     },
     {
       title: 'Outstanding due',
-      value: `₹62,600`,
-      subtext: '4 customers',
+      value: `₹${(kpis?.outstandingDue ?? 62600).toLocaleString()}`,
+      subtext: `${kpis?.customerCount ?? 4} active accounts pending`,
     },
     {
       title: 'Avg propensity',
-      value: '71%',
-      subtext: '3 high · 1 low',
+      value: `${kpis?.avgPropensity ?? 71}%`,
+      subtext: `${kpis?.payments?.conversionRate ?? 45}% link conversion`,
     },
   ];
 

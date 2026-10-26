@@ -7,6 +7,10 @@ import {
   DollarSign,
   ChevronDown,
   RotateCw,
+  Search,
+  Plus,
+  X,
+  MessageSquare,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -201,8 +205,130 @@ export const WhatsAppInbox: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
+  // Search in conversation list
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Search inside active conversation messages
+  const [isChatSearchOpen, setIsChatSearchOpen] = useState<boolean>(false);
+  const [chatSearchQuery, setChatSearchQuery] = useState<string>('');
+
+  // New Chat modal state
+  const [isNewChatOpen, setIsNewChatOpen] = useState<boolean>(false);
+  const [newChatForm, setNewChatForm] = useState({
+    name: '',
+    phone: '',
+    company: '',
+    plan: 'Business Plan',
+    planAmount: 9900,
+    initialMessage: '',
+  });
+
+  const filteredConversations = conversations.filter((c) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const matchName = c.name.toLowerCase().includes(q);
+    const matchPhone = c.phone.toLowerCase().includes(q);
+    const matchCompany = c.company.toLowerCase().includes(q);
+    const matchSnippet = c.snippet.toLowerCase().includes(q);
+    const matchMessages = c.messages.some((m) => m.text.toLowerCase().includes(q));
+    return matchName || matchPhone || matchCompany || matchSnippet || matchMessages;
+  });
+
   const currentContact =
-    conversations.find((c) => c.id === selectedId) || conversations[0];
+    conversations.find((c) => c.id === selectedId) ||
+    filteredConversations[0] ||
+    conversations[0];
+
+  const handleCreateNewChat = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newChatForm.name.trim() || !newChatForm.phone.trim()) {
+      toast.error('Please enter customer name and WhatsApp number');
+      return;
+    }
+
+    const nameParts = newChatForm.name.trim().split(' ');
+    const initials =
+      nameParts.length >= 2
+        ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+        : newChatForm.name.slice(0, 2).toUpperCase();
+
+    const colors = [
+      'bg-blue-600',
+      'bg-indigo-600',
+      'bg-sky-600',
+      'bg-teal-600',
+      'bg-purple-600',
+      'bg-cyan-700',
+    ];
+    const avatarColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const initialMsgText =
+      newChatForm.initialMessage.trim() ||
+      `Hello ${newChatForm.name.trim()}, this is HALOOCOM WhatsApp Billing regarding your account ${
+        newChatForm.company ? `at ${newChatForm.company}` : ''
+      }.`;
+
+    const newId = `conv_${Date.now()}`;
+    const newMsg: ChatMessage = {
+      id: `m_${Date.now()}`,
+      sender: 'agent',
+      text: initialMsgText,
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      status: 'read',
+    };
+
+    const newConv: ConversationItem = {
+      id: newId,
+      name: newChatForm.name.trim(),
+      company: newChatForm.company.trim() || 'Independent Enterprise',
+      phone: newChatForm.phone.trim(),
+      initials,
+      avatarColor,
+      lastTime: 'Just now',
+      snippet: initialMsgText,
+      isOutboundSnippet: true,
+      plan: `${newChatForm.plan || 'Business'} · ₹${Number(
+        newChatForm.planAmount || 9900
+      ).toLocaleString()}/month`,
+      planAmount: Number(newChatForm.planAmount || 9900),
+      dueInDays: 7,
+      propensityScore: 88,
+      propensityLevel: 'High',
+      messages: [newMsg],
+    };
+
+    setConversations((prev) => [newConv, ...prev]);
+    setSelectedId(newId);
+    setIsNewChatOpen(false);
+    setNewChatForm({
+      name: '',
+      phone: '',
+      company: '',
+      plan: 'Business Plan',
+      planAmount: 9900,
+      initialMessage: '',
+    });
+
+    // Fire ingest webhook in background
+    fetch('/api/ingest/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'change-me-ingest-api-key',
+      },
+      body: JSON.stringify({
+        type: 'message_sent',
+        contact: newConv.phone,
+        agent: 'Admin User',
+        metadata: { text: initialMsgText },
+      }),
+    }).catch(() => {});
+
+    toast.success(`WhatsApp chat started with ${newConv.name}!`);
+  };
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
@@ -385,105 +511,212 @@ export const WhatsAppInbox: React.FC = () => {
       <div className="grid grid-cols-12 gap-5 min-h-[640px] items-stretch">
         {/* Left Column: Conversations List (3 cols) */}
         <div className="col-span-12 md:col-span-4 lg:col-span-3 crm-card p-0 flex flex-col overflow-hidden bg-white">
-          <div className="p-4 border-b border-gray-100">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              WhatsApp conversations
-            </h3>
+          <div className="p-3.5 border-b border-gray-100 flex items-center justify-between bg-white">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-gray-800 tracking-tight">
+                Conversations
+              </h3>
+              <span className="px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-700 text-[10px] font-mono font-bold">
+                {filteredConversations.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsNewChatOpen(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Chat</span>
+            </button>
+          </div>
+
+          {/* Search Filter Bar */}
+          <div className="p-2.5 border-b border-gray-100 bg-gray-50/70">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search name, phone, or msg..."
+                className="w-full text-xs pl-8 pr-7 py-1.5 rounded-lg border border-gray-200 bg-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="divide-y divide-gray-50 overflow-y-auto flex-1">
-            {conversations.map((conv) => {
-              const isSelected = conv.id === selectedId;
-              return (
-                <div
-                  key={conv.id}
-                  onClick={() => setSelectedId(conv.id)}
-                  className={`p-3.5 flex items-start gap-3 cursor-pointer transition-colors ${
-                    isSelected ? 'bg-blue-50/80 border-l-4 border-blue-600' : 'hover:bg-gray-50/80'
-                  }`}
-                >
-                  {/* Avatar with WhatsApp blue badge */}
-                  <div className="relative shrink-0">
-                    <div
-                      className={`w-10 h-10 rounded-full ${conv.avatarColor} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
-                    >
-                      {conv.initials}
-                    </div>
-                    {/* Blue WhatsApp Icon Pill */}
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900 truncate">
-                        {conv.name}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-mono">
-                        {conv.lastTime}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
-                      {conv.isOutboundSnippet && (
-                        <CheckCheck className="w-3 h-3 text-blue-600 shrink-0" />
-                      )}
-                      <span className="truncate">{conv.snippet}</span>
-                    </p>
-                  </div>
+            {filteredConversations.length === 0 ? (
+              <div className="p-8 text-center space-y-2">
+                <div className="w-9 h-9 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <Search className="w-4 h-4" />
                 </div>
-              );
-            })}
+                <div className="text-xs font-semibold text-gray-600">No chats found</div>
+                <p className="text-[11px] text-gray-400">No contacts match "{searchQuery}"</p>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-1 text-xs font-semibold text-blue-600 hover:underline"
+                >
+                  Clear search
+                </button>
+              </div>
+            ) : (
+              filteredConversations.map((conv) => {
+                const isSelected = conv.id === selectedId;
+                return (
+                  <div
+                    key={conv.id}
+                    onClick={() => setSelectedId(conv.id)}
+                    className={`p-3.5 flex items-start gap-3 cursor-pointer transition-colors ${
+                      isSelected ? 'bg-blue-50/80 border-l-4 border-blue-600' : 'hover:bg-gray-50/80'
+                    }`}
+                  >
+                    {/* Avatar with WhatsApp blue badge */}
+                    <div className="relative shrink-0">
+                      <div
+                        className={`w-10 h-10 rounded-full ${conv.avatarColor} text-white flex items-center justify-center font-bold text-xs shadow-sm`}
+                      >
+                        {conv.initials}
+                      </div>
+                      {/* Blue WhatsApp Icon Pill */}
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white">
+                        <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-gray-900 truncate">
+                          {conv.name}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-mono">
+                          {conv.lastTime}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-gray-500 truncate mt-0.5 flex items-center gap-1">
+                        {conv.isOutboundSnippet && (
+                          <CheckCheck className="w-3 h-3 text-blue-600 shrink-0" />
+                        )}
+                        <span className="truncate">{conv.snippet}</span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
         {/* Middle Column: Chat Thread (6 cols) */}
         <div className="col-span-12 md:col-span-8 lg:col-span-6 crm-card p-0 flex flex-col justify-between bg-[#fbfcfd]">
           {/* Conversation Header */}
-          <div className="p-4 border-b border-gray-100 bg-white flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-gray-900">
-                {currentContact.name}
-              </h2>
-              <div className="text-[11px] text-gray-500">
-                {currentContact.company} · {currentContact.phone}
+          <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-gray-900">
+                  {currentContact.name}
+                </h2>
+                <div className="text-[11px] text-gray-500">
+                  {currentContact.company} · {currentContact.phone}
+                </div>
               </div>
             </div>
+
+            {/* In-chat search button */}
+            <button
+              type="button"
+              onClick={() => setIsChatSearchOpen((prev) => !prev)}
+              className={`p-2 rounded-lg text-xs font-semibold border transition-colors flex items-center gap-1.5 ${
+                isChatSearchOpen
+                  ? 'bg-blue-50 border-blue-200 text-blue-700'
+                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+              title="Search messages in this chat"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Search in chat</span>
+            </button>
           </div>
+
+          {/* In-chat message search bar (expandable) */}
+          {isChatSearchOpen && (
+            <div className="px-4 py-2 border-b border-gray-100 bg-blue-50/60 flex items-center gap-2">
+              <Search className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <input
+                type="text"
+                value={chatSearchQuery}
+                onChange={(e) => setChatSearchQuery(e.target.value)}
+                placeholder="Filter messages in this conversation..."
+                className="flex-1 text-xs bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+                autoFocus
+              />
+              {chatSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setChatSearchQuery('')}
+                  className="text-gray-400 hover:text-gray-600 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Chat Messages Body */}
           <div className="flex-1 p-5 space-y-3.5 overflow-y-auto">
-            {currentContact.messages.map((m) => {
-              const isOutbound = m.sender === 'agent';
-              return (
-                <div
-                  key={m.id}
-                  className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] px-4 py-2.5 text-xs ${
-                      isOutbound ? 'bubble-outbound' : 'bubble-inbound'
-                    }`}
-                  >
-                    <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>
-                    <div className="flex items-center justify-end gap-1 mt-1 text-[10px] text-gray-500">
-                      <span>{m.timestamp}</span>
-                      {isOutbound && (
-                        <CheckCheck className="w-3.5 h-3.5 text-blue-600" />
-                      )}
+            {currentContact.messages.filter((m) => {
+              if (!chatSearchQuery.trim()) return true;
+              return m.text.toLowerCase().includes(chatSearchQuery.toLowerCase());
+            }).length === 0 ? (
+              <div className="py-12 text-center text-xs text-gray-400">
+                No messages match "{chatSearchQuery}" in this conversation.
+              </div>
+            ) : (
+              currentContact.messages
+                .filter((m) => {
+                  if (!chatSearchQuery.trim()) return true;
+                  return m.text.toLowerCase().includes(chatSearchQuery.toLowerCase());
+                })
+                .map((m) => {
+                  const isOutbound = m.sender === 'agent';
+                  return (
+                    <div
+                      key={m.id}
+                      className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[85%] px-4 py-2.5 text-xs ${
+                          isOutbound ? 'bubble-outbound' : 'bubble-inbound'
+                        }`}
+                      >
+                        <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>
+                        <div className="flex items-center justify-end gap-1 mt-1 text-[10px] text-gray-500">
+                          <span>{m.timestamp}</span>
+                          {isOutbound && (
+                            <CheckCheck className="w-3.5 h-3.5 text-blue-600" />
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })
+            )}
           </div>
 
           {/* Bottom Chat Bar */}
@@ -580,6 +813,142 @@ export const WhatsAppInbox: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* New WhatsApp Chat Modal */}
+      {isNewChatOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">
+                    Start New WhatsApp Conversation
+                  </h3>
+                  <p className="text-[11px] text-gray-500">
+                    Dispatch an instant WhatsApp message to an existing or new customer
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewChatOpen(false)}
+                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewChat} className="p-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Customer Full Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newChatForm.name}
+                    onChange={(e) =>
+                      setNewChatForm({ ...newChatForm, name: e.target.value })
+                    }
+                    placeholder="e.g. Vikram Sen"
+                    className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    WhatsApp Phone Number <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newChatForm.phone}
+                    onChange={(e) =>
+                      setNewChatForm({ ...newChatForm, phone: e.target.value })
+                    }
+                    placeholder="+91 98765 00000"
+                    className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Company / Organization
+                  </label>
+                  <input
+                    type="text"
+                    value={newChatForm.company}
+                    onChange={(e) =>
+                      setNewChatForm({ ...newChatForm, company: e.target.value })
+                    }
+                    placeholder="e.g. Apex Tech Corp"
+                    className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Due / Subscription Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={newChatForm.planAmount}
+                    onChange={(e) =>
+                      setNewChatForm({
+                        ...newChatForm,
+                        planAmount: Number(e.target.value),
+                      })
+                    }
+                    placeholder="9900"
+                    className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Initial WhatsApp Message
+                </label>
+                <textarea
+                  rows={3}
+                  value={newChatForm.initialMessage}
+                  onChange={(e) =>
+                    setNewChatForm({
+                      ...newChatForm,
+                      initialMessage: e.target.value,
+                    })
+                  }
+                  placeholder="Type opening message or leave blank for automatic HALOOCOM greeting..."
+                  className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsNewChatOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Start WhatsApp Chat</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

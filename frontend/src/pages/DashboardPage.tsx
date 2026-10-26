@@ -38,6 +38,30 @@ export default function DashboardPage() {
     refresh,
   } = useDashboard();
 
+  const handlePresetChange = (preset: string) => {
+    setDateSummaryPreset(preset);
+    const now = new Date();
+    const toStr = now.toISOString().slice(0, 10);
+    let fromStr = toStr;
+    if (preset === '7d') {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      fromStr = d.toISOString().slice(0, 10);
+    } else if (preset === '30d') {
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      fromStr = d.toISOString().slice(0, 10);
+    }
+    setDateRange({ from: fromStr, to: toStr, preset });
+    toast.success(
+      preset === 'today'
+        ? "Displaying Today's live metrics"
+        : preset === '7d'
+        ? 'Displaying Last 7 days metrics'
+        : 'Displaying 30 days summary'
+    );
+  };
+
   const handleExportCsv = async () => {
     try {
       const data = await dashboardApi.exportCsv('payments', {
@@ -86,8 +110,8 @@ export default function DashboardPage() {
                   <div className="relative">
                     <select
                       value={dateSummaryPreset}
-                      onChange={(e) => setDateSummaryPreset(e.target.value)}
-                      className="appearance-none text-xs font-medium bg-white border border-gray-200 text-gray-700 rounded-xl px-3.5 py-2 pr-8 shadow-sm focus:outline-none cursor-pointer"
+                      onChange={(e) => handlePresetChange(e.target.value)}
+                      className="appearance-none text-xs font-medium bg-white border border-gray-200 text-gray-700 rounded-xl px-3.5 py-2 pr-8 shadow-sm focus:outline-none cursor-pointer hover:border-gray-300 transition-colors"
                     >
                       <option value="30d">Daily summary (30 days)</option>
                       <option value="7d">Last 7 days</option>
