@@ -63,28 +63,28 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-gray-950 overflow-hidden px-4 selection:bg-brand-500 selection:text-white">
-      {/* Background ambient gradient blurs (Blue theme) */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-[#f8fafc] overflow-hidden px-4 selection:bg-blue-600 selection:text-white">
+      {/* Background ambient soft blue gradients */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-400/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-400/15 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Subtle geometric dot grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.4] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, #cbd5e1 1px, transparent 0)`,
           backgroundSize: '32px 32px',
         }}
       />
 
       <div className="relative w-full max-w-md z-10 animate-fade-in-up">
         {/* Card Container */}
-        <div className="bg-gray-900/95 rounded-3xl p-8 sm:p-10 border border-gray-800 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+        <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-200 shadow-xl shadow-blue-900/5">
           {/* HALOOCOM + WhatsApp Brand Logos */}
           <div className="flex flex-col items-center text-center mb-8">
             <div className="relative inline-block mb-4">
               {/* White container for HALOOCOM Logo */}
-              <div className="w-24 h-24 rounded-3xl bg-white p-3 shadow-[0_0_35px_rgba(37,99,235,0.3)] flex items-center justify-center border border-blue-500/30">
+              <div className="w-24 h-24 rounded-3xl bg-white p-3 shadow-md shadow-blue-600/10 flex items-center justify-center border border-gray-100">
                 <img
                   src="/haloocom-logo.png"
                   alt="HALOOCOM"
@@ -93,7 +93,7 @@ export const LoginPage: React.FC = () => {
               </div>
 
               {/* WhatsApp round badge overlapping at bottom right corner */}
-              <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-full bg-[#25D366] border-2 border-gray-900 flex items-center justify-center text-white shadow-lg">
+              <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-full bg-[#25D366] border-2 border-white flex items-center justify-center text-white shadow-md">
                 <svg
                   className="w-5 h-5 fill-current"
                   viewBox="0 0 24 24"
@@ -103,17 +103,17 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <h1 className="text-2xl font-black tracking-tight text-white">
+            <h1 className="text-2xl font-black tracking-tight text-gray-900">
               HALOOCOM
             </h1>
-            <p className="text-xs text-blue-400 font-medium mt-1">
-              Enterprise WhatsApp Intelligence & Automation
+            <p className="text-xs text-blue-600 font-bold uppercase tracking-wider font-mono mt-1">
+              Enterprise WhatsApp Intelligence
             </p>
           </div>
 
           {/* Error Message banner */}
           {errorMessage && (
-            <div className="mb-6 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+            <div className="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -122,7 +122,7 @@ export const LoginPage: React.FC = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold text-gray-700 mb-1.5">
                 Work Email
               </label>
               <div className="relative">
@@ -133,13 +133,13 @@ export const LoginPage: React.FC = () => {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="admin@haloocom.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-950/90 border border-gray-800 rounded-xl text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/30 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+              <label className="block text-xs font-bold text-gray-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -150,7 +150,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-950/90 border border-gray-800 rounded-xl text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600/30 transition-all"
                 />
               </div>
             </div>
@@ -158,7 +158,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-[0_0_20px_rgba(37,99,235,0.35)] hover:shadow-[0_0_30px_rgba(37,99,235,0.55)] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -175,19 +175,19 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Demo Credentials hint card */}
-          <div className="mt-6 pt-5 border-t border-gray-800/80">
-            <div className="p-3 rounded-xl bg-gray-950/60 border border-gray-800/70 text-xs flex items-center justify-between">
+          <div className="mt-6 pt-5 border-t border-gray-100">
+            <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200/80 text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-3.5 h-3.5 text-blue-400" />
-                <div className="text-[11px] text-gray-300">
-                  <span className="font-mono text-blue-400">admin@demo.com</span> /{' '}
-                  <span className="font-mono text-blue-400">admin123</span>
+                <KeyRound className="w-3.5 h-3.5 text-blue-600" />
+                <div className="text-[11px] text-gray-700 font-medium">
+                  <span className="font-mono text-blue-800 font-bold">admin@demo.com</span> /{' '}
+                  <span className="font-mono text-blue-800 font-bold">admin123</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={fillDemoCredentials}
-                className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-[11px] font-bold text-blue-700 hover:text-blue-900 transition-colors"
               >
                 Auto-fill
               </button>

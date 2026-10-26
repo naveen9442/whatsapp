@@ -1,4 +1,5 @@
 import React from 'react';
+import { DollarSign } from 'lucide-react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -57,11 +58,22 @@ export const CollectionChart: React.FC<CollectionChartProps> = ({
   }
 
   return (
-    <div className="crm-card p-6 flex flex-col justify-between h-[300px]">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-bold text-gray-800 tracking-tight">
-          Daily collection · <span className="font-normal text-gray-500">last 7 days</span>
-        </h3>
+    <div className="crm-card p-6 flex flex-col justify-between h-[320px]">
+      <div className="flex items-center justify-between mb-2 border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/80 shadow-xs">
+            <DollarSign className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900 tracking-tight">
+              Daily Collections Settled
+            </h3>
+            <p className="text-[11px] text-gray-500 font-medium">WhatsApp direct payment links</p>
+          </div>
+        </div>
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 font-mono">
+          Last 7 Days
+        </span>
       </div>
 
       <div className="h-[220px] w-full">

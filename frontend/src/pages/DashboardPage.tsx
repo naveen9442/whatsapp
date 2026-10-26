@@ -14,7 +14,7 @@ import AgentTable from '../components/AgentTable';
 import PaymentsTable from '../components/PaymentsTable';
 import PendingLinksTable from '../components/PendingLinksTable';
 import { dashboardApi, downloadBlob } from '../api/client';
-import { Download, ChevronDown, Layers } from 'lucide-react';
+import { Download, ChevronDown, Layers, LayoutDashboard } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function DashboardPage() {
@@ -95,13 +95,22 @@ export default function DashboardPage() {
           {activeView === 'dashboard' && (
             <div className="space-y-6">
               {/* Dashboard Top Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-xl font-black text-gray-900 tracking-tight">
-                    Dashboard
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 font-mono uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                      Live Workspace
+                    </span>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-xs font-semibold text-gray-500">HALOOCOM WhatsApp Suite</span>
+                  </div>
+                  <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2.5">
+                    <LayoutDashboard className="w-6 h-6 text-blue-600" />
+                    <span>Executive Collections Dashboard</span>
                   </h1>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    WhatsApp revenue collection, reply velocity, and customer propensity
+                  <p className="text-xs text-gray-500 font-medium">
+                    Automated WhatsApp revenue recovery, double-tick velocity, and customer payment propensity
                   </p>
                 </div>
 
@@ -111,11 +120,11 @@ export default function DashboardPage() {
                     <select
                       value={dateSummaryPreset}
                       onChange={(e) => handlePresetChange(e.target.value)}
-                      className="appearance-none text-xs font-medium bg-white border border-gray-200 text-gray-700 rounded-xl px-3.5 py-2 pr-8 shadow-sm focus:outline-none cursor-pointer hover:border-gray-300 transition-colors"
+                      className="appearance-none text-xs font-semibold bg-gray-50 hover:bg-white border border-gray-200 text-gray-700 rounded-xl px-3.5 py-2.5 pr-8 shadow-xs focus:outline-none cursor-pointer transition-colors"
                     >
                       <option value="30d">Daily summary (30 days)</option>
                       <option value="7d">Last 7 days</option>
-                      <option value="today">Today's metrics</option>
+                      <option value="today">Today's live metrics</option>
                     </select>
                     <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
@@ -123,7 +132,7 @@ export default function DashboardPage() {
                   {/* Export CSV Button (Blue Theme) */}
                   <button
                     onClick={handleExportCsv}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Export CSV</span>

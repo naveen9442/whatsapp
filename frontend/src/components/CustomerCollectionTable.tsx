@@ -1,4 +1,5 @@
 import React from 'react';
+import { Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export interface CustomerRow {
@@ -104,13 +105,23 @@ export const CustomerCollectionTable: React.FC<CustomerCollectionTableProps> = (
   return (
     <div className="crm-card overflow-hidden">
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-gray-900 tracking-tight">
-            Customer collection & payment propensity
-          </h3>
-          <p className="text-xs text-gray-400 mt-0.5">
-            AI-predicted likelihood to settle dues via WhatsApp
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/80 shadow-xs">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-black text-gray-900 tracking-tight">
+                Customer Collection & Payment Propensity
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-mono uppercase">
+                AI Scored
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium mt-0.5">
+              Automated behavioral scoring based on invoice history, reply latency, and payment habits
+            </p>
+          </div>
         </div>
       </div>
 

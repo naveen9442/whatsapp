@@ -62,12 +62,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
             <div className="min-w-0">
-              <h2 className="text-sm font-black text-gray-900 tracking-wider truncate">
+              <h2 className="text-base font-black text-gray-900 tracking-wider truncate leading-tight">
                 HALOOCOM
               </h2>
-              <span className="text-[10px] text-blue-600 font-mono tracking-tight block truncate font-bold">
-                WhatsApp Enterprise
-              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+                <span className="text-[10px] text-blue-700 font-bold font-mono tracking-tight block truncate uppercase">
+                  WhatsApp Enterprise
+                </span>
+              </div>
             </div>
           </div>
         </div>

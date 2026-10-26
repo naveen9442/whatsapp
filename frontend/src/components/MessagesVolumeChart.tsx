@@ -1,4 +1,5 @@
 import React from 'react';
+import { MessageSquare } from 'lucide-react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -50,20 +51,27 @@ export const MessagesVolumeChart: React.FC<MessagesVolumeChartProps> = ({
   }
 
   return (
-    <div className="crm-card p-6 flex flex-col justify-between h-[300px]">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-bold text-gray-800 tracking-tight">
-          Messages · <span className="text-blue-700 font-medium">sent</span> vs{' '}
-          <span className="text-sky-500 font-medium">received</span>
-        </h3>
-        <div className="flex items-center gap-3 text-[11px] text-gray-500 font-medium">
+    <div className="crm-card p-6 flex flex-col justify-between h-[320px]">
+      <div className="flex items-center justify-between mb-2 border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/80 shadow-xs">
+            <MessageSquare className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900 tracking-tight">
+              Dispatch & Reply Volume
+            </h3>
+            <p className="text-[11px] text-gray-500 font-medium">Outbound sent vs incoming replies</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] text-gray-500 font-medium bg-gray-50/80 px-2.5 py-1 rounded-lg border border-gray-100">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-[#1d4ed8]" />
-            <span>Sent</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1d4ed8]" />
+            <span className="font-semibold text-gray-700">Sent</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-[#60a5fa]" />
-            <span>Received</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#60a5fa]" />
+            <span className="font-semibold text-gray-700">Received</span>
           </div>
         </div>
       </div>

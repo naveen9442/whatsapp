@@ -137,21 +137,28 @@ export const WhatsAppDeliveryPipeline: React.FC<WhatsAppDeliveryPipelineProps> =
   return (
     <div className="crm-card p-6 bg-white space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
-        <div>
-          <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <span>WhatsApp Delivery & Response Pipeline</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-              Live Receipts
-            </span>
-          </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Real-time tracking of message dispatch, double-tick delivery, blue-tick views, and pending responses
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/80 shadow-xs">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-black text-gray-900 tracking-tight">
+                WhatsApp Delivery & Response Pipeline
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 font-mono uppercase">
+                Live Receipts
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium mt-0.5">
+              Real-time tracking of message dispatch, double-tick delivery, blue-tick views, and pending responses
+            </p>
+          </div>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[11px] text-gray-500 font-medium">
+        <div className="flex items-center gap-3 text-[11px] text-gray-500 font-medium bg-gray-50/80 px-3 py-1.5 rounded-xl border border-gray-100">
           <div className="flex items-center gap-1">
             <CheckCheck className="w-3.5 h-3.5 text-slate-400 stroke-[2.5]" />
             <span>Delivered</span>
