@@ -4,7 +4,8 @@
 
 :root {
   --crm-bg: #f8fafc;
-  --crm-sidebar: #091124;
+  --crm-sidebar: #ffffff;
+  --crm-sidebar-border: #e2e8f0;
   --crm-card: #ffffff;
   --crm-border: #e2e8f0;
 }
