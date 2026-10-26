@@ -1,4 +1,9 @@
 #!/bin/bash
+# Re-exec with bash if invoked with sh
+if [ -z "$BASH_VERSION" ]; then
+    exec bash "$0" "$@"
+fi
+
 set -e
 
 # Colors
@@ -9,11 +14,11 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}====================================================${NC}"
-echo -e "${BLUE}     WhatsApp Monitor & CRM - Fast Redeploy        ${NC}"
+echo -e "${BLUE}     HALOOCOM WhatsApp Monitor - Fast Redeploy     ${NC}"
 echo -e "${BLUE}====================================================${NC}"
 
 # Check docker
-if ! command -v docker &> /dev/null; then
+if ! command -v docker > /dev/null 2>&1; then
     echo -e "${RED}Docker is not installed. Please run './setup.sh' first.${NC}"
     exit 1
 fi

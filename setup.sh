@@ -1,4 +1,9 @@
 #!/bin/bash
+# Re-exec with bash if invoked with sh (e.g. `sh setup.sh`)
+if [ -z "$BASH_VERSION" ]; then
+    exec bash "$0" "$@"
+fi
+
 set -e
 
 # Colors
@@ -9,17 +14,24 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}====================================================${NC}"
-echo -e "${BLUE}   WhatsApp Monitor & CRM - Initial Server Setup   ${NC}"
+echo -e "${BLUE}   HALOOCOM WhatsApp Monitor - Initial Server Setup ${NC}"
 echo -e "${BLUE}====================================================${NC}"
 
 # 1. Check root / sudo
-if [ "$EUID" -ne 0 ]; then
+if [ "$(id -u)" -ne 0 ]; then
   echo -e "${YELLOW}Warning: Running as non-root. If commands fail, re-run with 'sudo bash setup.sh'${NC}"
 fi
 
 # 2. Check & Install Docker / Docker Compose if missing
 echo -e "\n${YELLOW}[1/5] Checking Docker and Docker Compose...${NC}"
-if ! command -v docker &> /dev/null; then
+
+# Remove conflicting Ubuntu default docker-compose-v2 package if present to avoid dpkg overwrite errors
+if dpkg -l 2>/dev/null | grep -q "docker-compose-v2"; then
+    echo "Resolving package conflicts with docker-compose-v2..."
+    apt-get remove -y docker-compose-v2 > /dev/null 2>&1 || true
+fi
+
+if ! command -v docker > /dev/null 2>&1; then
     echo "Installing Docker Engine..."
     apt-get update -y
     apt-get install -y ca-certificates curl gnupg lsb-release
@@ -32,6 +44,12 @@ if ! command -v docker &> /dev/null; then
     systemctl start docker
     echo -e "${GREEN}Docker installed successfully!${NC}"
 else
+    # Ensure docker-compose plugin is functional
+    if ! docker compose version > /dev/null 2>&1; then
+        echo "Installing Docker Compose plugin..."
+        apt-get install -y --fix-broken > /dev/null 2>&1 || true
+        apt-get install -y docker-compose-plugin || apt-get install -y --allow-downgrades docker-compose-plugin
+    fi
     echo -e "${GREEN}Docker is already installed ($(docker --version))${NC}"
 fi
 
