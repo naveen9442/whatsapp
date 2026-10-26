@@ -244,54 +244,32 @@ export const ReportsView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Bar — Zoho-Style High-Contrast Banner with Vibrant Status Badges */}
-      <div className="bg-[#0f172a] text-white p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shrink-0 shadow-inner">
-            <BarChart3 className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-black text-white tracking-tight">
-                Executive Reports & Audit
-              </h1>
-              {/* Zoho-style Authenticated / Live Verified Green Pill */}
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#10b981] text-white shadow-xs">
-                <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Live Verified</span>
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 font-medium mt-1">
-              Enterprise WhatsApp collection intelligence, receivable aging, and conversion audit
-            </p>
-          </div>
-        </div>
-
+      {/* Action Toolbar — Audit Cycle Period & Export Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-200/90 shadow-xs">
         <div className="flex items-center gap-2.5">
-          {/* Time range selector */}
+          <span className="text-xs font-bold text-gray-700">Audit Cycle Period:</span>
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-200 rounded-xl px-3.5 py-2.5 shadow-xs focus:outline-none cursor-pointer hover:bg-slate-750 transition-colors"
+            className="text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-800 rounded-xl px-3.5 py-1.5 shadow-xs focus:outline-none cursor-pointer hover:bg-white transition-colors"
           >
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days (Full Cycle)</option>
             <option value="90d">This Quarter (Q4)</option>
           </select>
+        </div>
 
-          {/* Export CSV button */}
+        <div className="flex items-center gap-2.5">
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors shadow-xs"
           >
-            <Download className="w-3.5 h-3.5 text-slate-300" />
+            <Download className="w-3.5 h-3.5 text-gray-500" />
             <span>Export CSV</span>
           </button>
-
-          {/* Print / Save PDF button (Vibrant Blue like Zoho's Save button) */}
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print PDF</span>

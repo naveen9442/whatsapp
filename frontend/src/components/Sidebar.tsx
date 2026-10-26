@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-64 bg-white text-gray-700 flex flex-col justify-between shrink-0 select-none min-h-screen border-r border-gray-200">
       {/* Brand & Software Provider Header */}
       <div>
-        <div className="p-4 border-b border-slate-800 bg-[#0f172a] text-white">
+        <div className="h-20 px-5 border-b border-slate-800 bg-[#0f172a] text-white flex items-center shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative bg-white rounded-xl p-1.5 shadow-sm border border-slate-700 flex items-center justify-center shrink-0 w-11 h-11">
               <img

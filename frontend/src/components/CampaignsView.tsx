@@ -275,32 +275,17 @@ export const CampaignsView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Page Header — Zoho-Style High-Contrast Banner */}
-      <div className="bg-[#0f172a] text-white p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shrink-0 shadow-inner">
-            <Megaphone className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-black text-white tracking-tight">
-                Campaigns & Broadcasts
-              </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#10b981] text-white shadow-xs">
-                <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Meta Verified</span>
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 font-medium mt-1">
-              Dispatch compliant WhatsApp template broadcasts, automated collection reminders, and personalized drives
-            </p>
-          </div>
+      {/* Action Toolbar */}
+      <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-200/90 shadow-xs">
+        <div>
+          <span className="text-xs font-bold text-gray-800">Active Campaign Drives</span>
+          <p className="text-[11px] text-gray-500 font-medium">
+            Automated WhatsApp broadcast sequences and collection reminders
+          </p>
         </div>
-
-        {/* Primary Action: Create Campaign */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Create Campaign</span>

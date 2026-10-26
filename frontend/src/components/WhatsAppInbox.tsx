@@ -493,32 +493,19 @@ export const WhatsAppInbox: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Top Header — Zoho-Style High-Contrast Banner */}
-      <div className="bg-[#0f172a] text-white p-5 rounded-2xl border border-slate-800 shadow-md flex items-center justify-between">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shrink-0 shadow-inner">
-            <MessageSquare className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-black text-white tracking-tight">
-                WhatsApp Live Inbox
-              </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#10b981] text-white shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span>Cloud API Connected</span>
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 font-medium mt-1">
-              Direct two-way conversation channel with customer payment intelligence and rapid templates
-            </p>
-          </div>
+      {/* Action Toolbar */}
+      <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-200/90 shadow-xs">
+        <div>
+          <span className="text-xs font-bold text-gray-800">Direct Conversation Streams</span>
+          <p className="text-[11px] text-gray-500 font-medium">
+            Real-time two-way messaging, payment follow-up, and automated collection templates
+          </p>
         </div>
         <button
           onClick={handleSimulateIncoming}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors shadow-xs"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors shadow-xs"
         >
-          <RotateCw className="w-3.5 h-3.5 text-blue-400" />
+          <RotateCw className="w-3.5 h-3.5 text-blue-600" />
           <span>Simulate incoming WhatsApp</span>
         </button>
       </div>
