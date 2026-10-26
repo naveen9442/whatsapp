@@ -1,0 +1,691 @@
+openapi: 3.1.0
+info:
+  title: WhatsApp Monitor API
+  description: |
+    Read-only WhatsApp monitoring dashboard API.
+    Ingests events from Meta Cloud API, payment providers, and a generic CRM ingest endpoint.
+    Exposes dashboard metrics via authenticated REST endpoints.
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost/api
+    description: Local development (via Nginx)
+  - url: http://localhost:4000
+    description: Direct API access (development only)
+
+tags:
+  - name: auth
+    description: Authentication
+  - name: webhooks
+    description: Inbound event webhooks (no auth required, signature-validated)
+  - name: ingest
+    description: Generic event ingestion (API-key authenticated)
+  - name: dashboard
+    description: Dashboard metrics (JWT authenticated)
+  - name: health
+    description: Health and observability
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@demo.com
+        password:
+          type: string
+          example: admin123
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        user:
+          type: object
+          properties:
+            id: { type: string }
+            email: { type: string }
+            name: { type: string }
+            role: { type: string, enum: [ADMIN, VIEWER] }
+
+    IngestEvent:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [message_sent, reply_received, payment_link_shared, payment_received]
+        contact:
+          type: string
+          description: Contact phone number (e.g. 919876543210)
+          example: "919876543210"
+        agent:
+          type: string
+          description: Agent name or ID
+          example: "Rahul Kumar"
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp (ISO 8601). Defaults to now.
+        amount:
+          type: number
+          description: Transaction amount (for payment_link_shared and payment_received)
+          example: 1500
+        currency:
+          type: string
+          default: INR
+          example: INR
+        reference:
+          type: string
+          description: Payment link reference/ID for linking events
+          example: plink_ABC123
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional arbitrary metadata
+
+    KPIResponse:
+      type: object
+      properties:
+        messagesSent:
+          type: integer
+          description: Total outbound messages sent
+        delivered:
+          type: integer
+        read:
+          type: integer
+        failed:
+          type: integer
+        repliesReceived:
+          type: integer
+        replyRate:
+          type: number
+          description: "repliesReceived / messagesSent * 100"
+        linksShared:
+          type: integer
+        paymentsReceived:
+          type: integer
+        totalAmountReceived:
+          type: number
+          description: Total payment amount in primary currency unit
+        conversionRate:
+          type: number
+          description: "paymentsReceived / linksShared * 100"
+
+    TimeseriesPoint:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        messagesSent:
+          type: integer
+        replies:
+          type: integer
+
+    FunnelResponse:
+      type: object
+      properties:
+        sent:
+          type: integer
+        replied:
+          type: integer
+        linksShared:
+          type: integer
+        paid:
+          type: integer
+
+    AgentPerformance:
+      type: object
+      properties:
+        agentId:
+          type: string
+        agentName:
+          type: string
+        messagesSent:
+          type: integer
+        replies:
+          type: integer
+        linksShared:
+          type: integer
+        paymentsReceived:
+          type: integer
+        amountReceived:
+          type: number
+        replyRate:
+          type: number
+        conversionRate:
+          type: number
+
+    Payment:
+      type: object
+      properties:
+        id: { type: string }
+        providerRef: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        status: { type: string }
+        paidAt: { type: string, format: date-time }
+        paymentLink:
+          type: object
+          properties:
+            providerRef: { type: string }
+            provider: { type: string }
+
+    PaymentLink:
+      type: object
+      properties:
+        id: { type: string }
+        providerRef: { type: string }
+        provider: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        status:
+          type: string
+          enum: [CREATED, SHARED, PAID, EXPIRED, CANCELLED]
+        sharedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    Error:
+      type: object
+      properties:
+        statusCode: { type: integer }
+        message: { type: string }
+        error: { type: string }
+
+paths:
+  # Auth
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Login and obtain JWT access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Webhooks
+  /webhook/whatsapp:
+    get:
+      tags: [webhooks]
+      summary: WhatsApp webhook verification (Meta Cloud API)
+      parameters:
+        - name: hub.mode
+          in: query
+          required: true
+          schema: { type: string, enum: [subscribe] }
+        - name: hub.verify_token
+          in: query
+          required: true
+          schema: { type: string }
+        - name: hub.challenge
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Verification successful — returns hub.challenge
+        '403':
+          description: Token mismatch
+
+    post:
+      tags: [webhooks]
+      summary: Receive WhatsApp status and message events
+      description: |
+        Accepts Meta Cloud API webhook payloads.
+        Validates X-Hub-Signature-256 HMAC-SHA256 signature.
+        Responds 200 immediately; processes asynchronously via BullMQ.
+        Idempotent — duplicate events (same message ID) are discarded.
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: false
+          schema: { type: string }
+          description: "HMAC-SHA256 signature: sha256=<hex>"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Meta Cloud API webhook payload
+            example:
+              object: whatsapp_business_account
+              entry:
+                - id: "123456789"
+                  changes:
+                    - value:
+                        messaging_product: whatsapp
+                        metadata:
+                          display_phone_number: "9199999999"
+                          phone_number_id: "phone_id"
+                        statuses:
+                          - id: "wamid.HBgLOTE5..."
+                            status: delivered
+                            timestamp: "1700000000"
+                            recipient_id: "919876543210"
+                        messages:
+                          - from: "919876543210"
+                            id: "wamid.HBgL..."
+                            timestamp: "1700000001"
+                            type: text
+                            text:
+                              body: "Yes, please send the payment link"
+                      field: messages
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+
+  /webhook/payment/{provider}:
+    post:
+      tags: [webhooks]
+      summary: Receive payment provider webhook
+      description: |
+        Accepts webhooks from Razorpay, Stripe, or Cashfree.
+        Validates provider-specific HMAC signatures.
+        Responds 200 immediately; processes asynchronously.
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [razorpay, stripe, cashfree]
+        - name: X-Razorpay-Signature
+          in: header
+          schema: { type: string }
+          description: Razorpay HMAC-SHA256 signature (razorpay only)
+        - name: Stripe-Signature
+          in: header
+          schema: { type: string }
+          description: Stripe webhook signature (stripe only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              razorpay_payment_captured:
+                summary: Razorpay payment.captured
+                value:
+                  entity: event
+                  event: payment.captured
+                  payload:
+                    payment:
+                      entity:
+                        id: pay_ABC123
+                        amount: 150000
+                        currency: INR
+                        status: captured
+              razorpay_link_paid:
+                summary: Razorpay payment_link.paid
+                value:
+                  entity: event
+                  event: payment_link.paid
+                  payload:
+                    payment_link:
+                      entity:
+                        id: plink_XYZ
+                        amount: 150000
+                        currency: INR
+                        status: paid
+                        short_url: "https://rzp.io/i/abc"
+                    payment:
+                      entity:
+                        id: pay_ABC123
+                        amount: 150000
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+
+  # Ingest API
+  /ingest/events:
+    post:
+      tags: [ingest]
+      summary: Push events from CRM or agent tool
+      description: |
+        Push one event or an array of events.
+        Requires x-api-key header matching INGEST_API_KEY env var.
+        Idempotent — events with duplicate reference+type are discarded.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/IngestEvent'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/IngestEvent'
+            examples:
+              single:
+                summary: Single event
+                value:
+                  type: message_sent
+                  contact: "919876543210"
+                  agent: "Rahul Kumar"
+                  timestamp: "2024-01-15T10:30:00Z"
+              batch:
+                summary: Batch events
+                value:
+                  - type: payment_link_shared
+                    contact: "919876543210"
+                    agent: "Priya Sharma"
+                    reference: plink_ABC123
+                    amount: 1500
+                    currency: INR
+                  - type: payment_received
+                    contact: "919876543210"
+                    reference: plink_ABC123
+                    amount: 1500
+      responses:
+        '200':
+          description: Events accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted: { type: integer }
+                  duplicates: { type: integer }
+        '401':
+          description: Missing or invalid API key
+
+  /ingest/csv:
+    post:
+      tags: [ingest]
+      summary: Upload historical events as CSV
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: |
+                    CSV file with columns:
+                    type, contact, agent, timestamp, amount, currency, reference
+      responses:
+        '200':
+          description: CSV parsed and events enqueued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows: { type: integer }
+                  accepted: { type: integer }
+
+  # Dashboard
+  /dashboard/kpis:
+    get:
+      tags: [dashboard]
+      summary: Get KPI card data
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+          example: "2024-01-01"
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+          example: "2024-01-31"
+        - name: agentId
+          in: query
+          schema: { type: string }
+        - name: phone
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: KPI metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KPIResponse'
+        '401':
+          description: Unauthorized
+
+  /dashboard/timeseries:
+    get:
+      tags: [dashboard]
+      summary: Get time-series data for charts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: granularity
+          in: query
+          schema: { type: string, enum: [day, week], default: day }
+        - name: agentId
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Time series data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeseriesPoint'
+
+  /dashboard/funnel:
+    get:
+      tags: [dashboard]
+      summary: Get funnel stage counts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Funnel data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunnelResponse'
+
+  /dashboard/agents:
+    get:
+      tags: [dashboard]
+      summary: Get agent performance table
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Agent performance data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentPerformance'
+
+  /dashboard/payments/recent:
+    get:
+      tags: [dashboard]
+      summary: Get recent payments (paginated)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Paginated payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+
+  /dashboard/links/pending:
+    get:
+      tags: [dashboard]
+      summary: Get pending/active payment links
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Pending payment links
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentLink'
+                  total: { type: integer }
+
+  /dashboard/export/csv:
+    get:
+      tags: [dashboard]
+      summary: Export data as CSV
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema: { type: string, enum: [payments, links] }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
+  # Health
+  /health:
+    get:
+      tags: [health]
+      summary: Service health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  timestamp: { type: string, format: date-time }
+                  uptime: { type: number, description: Process uptime in seconds }
+                  version: { type: string }
+
+  /metrics:
+    get:
+      tags: [health]
+      summary: Prometheus metrics endpoint
+      responses:
+        '200':
+          description: Prometheus text exposition format
+          content:
+            text/plain:
+              schema:
+                type: string

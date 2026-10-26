@@ -1,0 +1,22 @@
+services:
+  api:
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./api/src:/app/src:ro
+    command: npm run start:dev
+
+  frontend:
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src:ro
+    command: npm run dev -- --host 0.0.0.0
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
