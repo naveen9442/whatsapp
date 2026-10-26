@@ -47,27 +47,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-64 bg-white text-gray-700 flex flex-col justify-between shrink-0 select-none min-h-screen border-r border-gray-200">
       {/* Brand & Software Provider Header */}
       <div>
-        <div className="p-5 border-b border-gray-100 bg-white">
+        <div className="p-4 border-b border-slate-800 bg-[#0f172a] text-white">
           <div className="flex items-center gap-3">
-            <div className="relative bg-white rounded-xl p-1.5 shadow-xs border border-gray-100 flex items-center justify-center shrink-0 w-11 h-11">
+            <div className="relative bg-white rounded-xl p-1.5 shadow-sm border border-slate-700 flex items-center justify-center shrink-0 w-11 h-11">
               <img
                 src="/haloocom-logo.png"
                 alt="HALOOCOM"
                 className="w-full h-full object-contain"
               />
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#25D366] rounded-full border border-white flex items-center justify-center text-white shadow-xs">
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#25D366] rounded-full border-2 border-[#0f172a] flex items-center justify-center text-white shadow-xs">
                 <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
                 </svg>
               </div>
             </div>
-            <div className="min-w-0">
-              <h2 className="text-base font-black text-gray-900 tracking-wider truncate leading-tight">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-black text-white tracking-wider truncate leading-tight">
                 HALOOCOM
               </h2>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                <span className="text-[10px] text-blue-700 font-bold font-mono tracking-tight block truncate uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="text-[10px] text-emerald-400 font-bold font-mono tracking-tight block truncate uppercase">
                   WhatsApp Enterprise
                 </span>
               </div>

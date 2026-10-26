@@ -244,20 +244,27 @@ export const ReportsView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-gray-900 tracking-tight">
-              Executive Reports & Audit
-            </h1>
-            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-800 font-bold uppercase font-mono">
-              Live Verified
-            </span>
+      {/* 1. Header Bar — Zoho-Style High-Contrast Banner with Vibrant Status Badges */}
+      <div className="bg-[#0f172a] text-white p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shrink-0 shadow-inner">
+            <BarChart3 className="w-5 h-5" />
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Enterprise WhatsApp collection intelligence, receivable aging, and conversion audit
-          </p>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-black text-white tracking-tight">
+                Executive Reports & Audit
+              </h1>
+              {/* Zoho-style Authenticated / Live Verified Green Pill */}
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#10b981] text-white shadow-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Live Verified</span>
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 font-medium mt-1">
+              Enterprise WhatsApp collection intelligence, receivable aging, and conversion audit
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -265,7 +272,7 @@ export const ReportsView: React.FC = () => {
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="text-xs font-semibold bg-white border border-gray-200 text-gray-700 rounded-xl px-3 py-2 shadow-sm focus:outline-none"
+            className="text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-200 rounded-xl px-3.5 py-2.5 shadow-xs focus:outline-none cursor-pointer hover:bg-slate-750 transition-colors"
           >
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days (Full Cycle)</option>
@@ -275,16 +282,16 @@ export const ReportsView: React.FC = () => {
           {/* Export CSV button */}
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors shadow-xs"
           >
-            <Download className="w-3.5 h-3.5 text-gray-500" />
+            <Download className="w-3.5 h-3.5 text-slate-300" />
             <span>Export CSV</span>
           </button>
 
-          {/* Print / Save PDF button */}
+          {/* Print / Save PDF button (Vibrant Blue like Zoho's Save button) */}
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print PDF</span>
@@ -292,38 +299,40 @@ export const ReportsView: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Top Executive Summary Metrics */}
+      {/* 2. Top Executive Summary Metrics with Zoho-style Distinct Color Accents */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="crm-card p-5 bg-white">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-medium">
+        <div className="crm-card p-5 bg-white border-t-4 border-t-blue-600 shadow-sm">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-bold uppercase tracking-wider">
             <span>Total Collections Settled</span>
-            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
               <DollarSign className="w-4 h-4" />
             </span>
           </div>
           <div className="text-2xl font-black text-gray-900 mt-2 font-mono">
             ₹{(reportData?.kpis?.amountReceived || 298926).toLocaleString()}
           </div>
-          <div className="text-[11px] text-blue-700 font-semibold mt-2 flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
-            <span>
-              {timeRange === '7d'
-                ? '+14.2% vs previous 7d'
-                : timeRange === '90d'
-                ? '+26.8% vs Q3 cycle'
-                : '+18.4% vs previous cycle'}
+          <div className="mt-2">
+            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+              <TrendingUp className="w-3 h-3" />
+              <span>
+                {timeRange === '7d'
+                  ? '+14.2% vs previous 7d'
+                  : timeRange === '90d'
+                  ? '+26.8% vs Q3 cycle'
+                  : '+18.4% vs previous cycle'}
+              </span>
             </span>
           </div>
         </div>
 
-        <div className="crm-card p-5 bg-white">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-medium">
+        <div className="crm-card p-5 bg-white border-t-4 border-t-emerald-500 shadow-sm">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-bold uppercase tracking-wider">
             <span>Payment Link Recovery Rate</span>
-            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
+            <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
               <TrendingUp className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-black text-gray-900 mt-2 font-mono">
+          <div className="text-2xl font-black text-emerald-700 mt-2 font-mono">
             {reportData?.kpis?.recoveryRate || 46.4}%
           </div>
           <div className="text-[11px] text-gray-500 mt-2 font-medium">
@@ -332,10 +341,10 @@ export const ReportsView: React.FC = () => {
           </div>
         </div>
 
-        <div className="crm-card p-5 bg-white">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-medium">
+        <div className="crm-card p-5 bg-white border-t-4 border-t-indigo-500 shadow-sm">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-bold uppercase tracking-wider">
             <span>Average Transaction Size</span>
-            <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+            <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100">
               <CheckCircle2 className="w-4 h-4" />
             </span>
           </div>
@@ -347,18 +356,20 @@ export const ReportsView: React.FC = () => {
           </div>
         </div>
 
-        <div className="crm-card p-5 bg-white">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-medium">
+        <div className="crm-card p-5 bg-white border-t-4 border-t-amber-500 shadow-sm">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-bold uppercase tracking-wider">
             <span>Outstanding Due at Risk</span>
-            <span className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
+            <span className="p-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-100">
               <AlertCircle className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-black text-gray-900 mt-2 font-mono">
+          <div className="text-2xl font-black text-amber-700 mt-2 font-mono">
             ₹{totalOverdue.toLocaleString()}
           </div>
-          <div className="text-[11px] text-amber-700 font-semibold mt-2">
-            {agingBuckets.reduce((acc: number, b: any) => acc + (b.count || 0), 0)} accounts currently pending
+          <div className="mt-2">
+            <span className="inline-flex items-center text-[11px] text-amber-800 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+              {agingBuckets.reduce((acc: number, b: any) => acc + (b.count || 0), 0)} accounts currently pending
+            </span>
           </div>
         </div>
       </div>
