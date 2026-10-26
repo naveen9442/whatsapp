@@ -289,7 +289,13 @@ export default function DashboardPage() {
         </header>
 
         {/* View Main Content Body */}
-        <main className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main
+          className={
+            activeView === 'inbox'
+              ? 'flex-1 min-h-0 overflow-hidden p-3.5 lg:p-4 flex flex-col'
+              : 'flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6'
+          }
+        >
           {activeView === 'dashboard' && (
             <div className="space-y-6">
               {/* 6 Metric Cards Row */}

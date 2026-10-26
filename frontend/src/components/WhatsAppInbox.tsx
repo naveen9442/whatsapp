@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CheckCheck,
   Send,
@@ -238,6 +238,22 @@ export const WhatsAppInbox: React.FC = () => {
     conversations.find((c) => c.id === selectedId) ||
     filteredConversations[0] ||
     conversations[0];
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+
+  // Auto-scroll to bottom immediately when switching conversation
+  useEffect(() => {
+    scrollToBottom('auto');
+  }, [selectedId]);
+
+  // Auto-scroll smoothly when new messages arrive
+  useEffect(() => {
+    scrollToBottom('smooth');
+  }, [currentContact?.messages?.length]);
 
   const handleCreateNewChat = (e: React.FormEvent) => {
     e.preventDefault();
@@ -492,29 +508,13 @@ export const WhatsAppInbox: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Action Toolbar */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-gray-200/90 shadow-xs">
-        <div>
-          <span className="text-xs font-bold text-gray-800">Direct Conversation Streams</span>
-          <p className="text-[11px] text-gray-500 font-medium">
-            Real-time two-way messaging, payment follow-up, and automated collection templates
-          </p>
-        </div>
-        <button
-          onClick={handleSimulateIncoming}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors shadow-xs"
-        >
-          <RotateCw className="w-3.5 h-3.5 text-blue-600" />
-          <span>Simulate incoming WhatsApp</span>
-        </button>
-      </div>
-
-      {/* Main 3-Column Split Interface */}
-      <div className="grid grid-cols-12 gap-5 min-h-[640px] items-stretch">
+    <div className="h-full flex-1 min-h-0 flex flex-col">
+      {/* Main 3-Column Split Interface - Fills 100% of available viewport */}
+      <div className="grid grid-cols-12 gap-3.5 flex-1 min-h-0 h-full items-stretch">
         {/* Left Column: Conversations List (3 cols) */}
-        <div className="col-span-12 md:col-span-4 lg:col-span-3 crm-card p-0 flex flex-col overflow-hidden bg-white">
-          <div className="p-3.5 border-b border-gray-100 flex items-center justify-between bg-white">
+        <div className="col-span-12 md:col-span-4 lg:col-span-3 bg-white rounded-2xl border border-gray-200/90 shadow-xs flex flex-col h-full min-h-0 overflow-hidden">
+          {/* Header */}
+          <div className="shrink-0 p-3.5 border-b border-gray-100 flex items-center justify-between bg-white">
             <div className="flex items-center gap-1.5">
               <h3 className="text-xs font-bold text-gray-800 tracking-tight">
                 Conversations
@@ -534,7 +534,7 @@ export const WhatsAppInbox: React.FC = () => {
           </div>
 
           {/* Search Filter Bar */}
-          <div className="p-2.5 border-b border-gray-100 bg-gray-50/70">
+          <div className="shrink-0 p-2.5 border-b border-gray-100 bg-gray-50/70">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -556,7 +556,8 @@ export const WhatsAppInbox: React.FC = () => {
             </div>
           </div>
 
-          <div className="divide-y divide-gray-50 overflow-y-auto flex-1">
+          {/* Conversations Scrollable List */}
+          <div className="divide-y divide-gray-50 overflow-y-auto flex-1 min-h-0">
             {filteredConversations.length === 0 ? (
               <div className="p-8 text-center space-y-2">
                 <div className="w-9 h-9 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
@@ -589,7 +590,6 @@ export const WhatsAppInbox: React.FC = () => {
                       >
                         {conv.initials}
                       </div>
-                      {/* Blue WhatsApp Icon Pill */}
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white">
                         <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
                           <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
@@ -622,44 +622,64 @@ export const WhatsAppInbox: React.FC = () => {
         </div>
 
         {/* Middle Column: Chat Thread (6 cols) */}
-        <div className="col-span-12 md:col-span-8 lg:col-span-6 crm-card p-0 flex flex-col justify-between bg-[#fbfcfd]">
-          {/* Conversation Header */}
-          <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.82L4.43 19.64L5.26 16.59L5.07 16.29C4.24 14.97 3.8 13.46 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z" />
-                </svg>
+        <div className="col-span-12 md:col-span-8 lg:col-span-6 bg-white rounded-2xl border border-gray-200/90 shadow-xs flex flex-col h-full min-h-0 overflow-hidden">
+          {/* Conversation Header - Fixed at Top */}
+          <div className="shrink-0 px-4 py-3 border-b border-gray-100 bg-white flex items-center justify-between z-10">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative shrink-0">
+                <div className={`w-10 h-10 rounded-full ${currentContact.avatarColor || 'bg-blue-600'} text-white flex items-center justify-center font-bold text-xs shadow-xs`}>
+                  {currentContact.initials}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
               </div>
-              <div>
-                <h2 className="text-sm font-bold text-gray-900">
-                  {currentContact.name}
-                </h2>
-                <div className="text-[11px] text-gray-500">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-gray-900 truncate">
+                    {currentContact.name}
+                  </h2>
+                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/50 hidden sm:inline">
+                    Online
+                  </span>
+                </div>
+                <div className="text-[11px] text-gray-500 truncate mt-0.5">
                   {currentContact.company} · {currentContact.phone}
                 </div>
               </div>
             </div>
 
-            {/* In-chat search button */}
-            <button
-              type="button"
-              onClick={() => setIsChatSearchOpen((prev) => !prev)}
-              className={`p-2 rounded-lg text-xs font-semibold border transition-colors flex items-center gap-1.5 ${
-                isChatSearchOpen
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-              title="Search messages in this chat"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Search in chat</span>
-            </button>
+            {/* Header Right Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Simulate Incoming Button right in chat header */}
+              <button
+                type="button"
+                onClick={handleSimulateIncoming}
+                title="Simulate incoming WhatsApp reply from customer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 transition-colors shadow-2xs"
+              >
+                <RotateCw className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">Simulate reply</span>
+              </button>
+
+              {/* In-chat search button */}
+              <button
+                type="button"
+                onClick={() => setIsChatSearchOpen((prev) => !prev)}
+                className={`p-2 rounded-lg text-xs font-semibold border transition-colors flex items-center gap-1.5 ${
+                  isChatSearchOpen
+                    ? 'bg-blue-50 border-blue-200 text-blue-700'
+                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+                title="Search messages in this chat"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Search in chat</span>
+              </button>
+            </div>
           </div>
 
           {/* In-chat message search bar (expandable) */}
           {isChatSearchOpen && (
-            <div className="px-4 py-2 border-b border-gray-100 bg-blue-50/60 flex items-center gap-2">
+            <div className="shrink-0 px-4 py-2 border-b border-gray-100 bg-blue-50/60 flex items-center gap-2">
               <Search className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <input
                 type="text"
@@ -681,8 +701,15 @@ export const WhatsAppInbox: React.FC = () => {
             </div>
           )}
 
-          {/* Chat Messages Body */}
-          <div className="flex-1 p-5 space-y-3.5 overflow-y-auto">
+          {/* Chat Messages Body - Scrollable Container */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-[#f8fafc]/90">
+            {/* WhatsApp Day Divider */}
+            <div className="flex justify-center my-1">
+              <span className="px-3 py-1 bg-white/95 text-gray-500 text-[10px] font-semibold rounded-full shadow-2xs border border-gray-200/60">
+                Today
+              </span>
+            </div>
+
             {currentContact.messages.filter((m) => {
               if (!chatSearchQuery.trim()) return true;
               return m.text.toLowerCase().includes(chatSearchQuery.toLowerCase());
@@ -704,8 +731,10 @@ export const WhatsAppInbox: React.FC = () => {
                       className={`flex ${isOutbound ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] px-4 py-2.5 text-xs ${
-                          isOutbound ? 'bubble-outbound' : 'bubble-inbound'
+                        className={`max-w-[82%] px-4 py-2.5 text-xs rounded-2xl shadow-2xs transition-all ${
+                          isOutbound
+                            ? 'bg-[#dcf8c6] text-gray-900 border border-[#bbf7d0]/60 rounded-tr-xs'
+                            : 'bg-white text-gray-900 border border-gray-100 rounded-tl-xs'
                         }`}
                       >
                         <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>
@@ -720,16 +749,52 @@ export const WhatsAppInbox: React.FC = () => {
                   );
                 })
             )}
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Bottom Chat Bar */}
-          <div className="p-3.5 border-t border-gray-100 bg-white">
+          {/* Quick Template Response Pills Bar */}
+          <div className="shrink-0 px-3 py-1.5 bg-gray-50 border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 mr-1">
+              Quick:
+            </span>
+            <button
+              type="button"
+              onClick={() => handleTemplateSelect('renewal')}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-white border border-gray-200 hover:border-blue-300 hover:text-blue-600 text-gray-700 whitespace-nowrap shadow-2xs transition-colors shrink-0"
+            >
+              📅 Plan Renewal
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTemplateSelect('reminder')}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-white border border-gray-200 hover:border-blue-300 hover:text-blue-600 text-gray-700 whitespace-nowrap shadow-2xs transition-colors shrink-0"
+            >
+              ⏰ Payment Reminder
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTemplateSelect('thanks')}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-white border border-gray-200 hover:border-blue-300 hover:text-blue-600 text-gray-700 whitespace-nowrap shadow-2xs transition-colors shrink-0"
+            >
+              🙏 Thank You
+            </button>
+            <button
+              type="button"
+              onClick={handleSendPaymentLink}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 whitespace-nowrap shadow-2xs transition-colors shrink-0 font-semibold"
+            >
+              💳 Payment Link
+            </button>
+          </div>
+
+          {/* Bottom Chat Bar - Fixed at Bottom */}
+          <div className="shrink-0 p-3 bg-white border-t border-gray-200/80">
             <div className="flex items-center gap-2">
               {/* Template dropdown */}
               <select
                 value={selectedTemplate}
                 onChange={(e) => handleTemplateSelect(e.target.value)}
-                className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-2.5 py-2 focus:outline-none focus:border-blue-500"
+                className="text-xs bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-2.5 py-2.5 focus:outline-none focus:border-blue-500 cursor-pointer"
               >
                 <option value="">Template...</option>
                 <option value="renewal">Plan Renewal Notice</option>
@@ -743,15 +808,22 @@ export const WhatsAppInbox: React.FC = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Type a WhatsApp message"
-                className="flex-1 text-xs bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                placeholder="Type a WhatsApp message..."
+                className="flex-1 text-xs bg-gray-50 hover:bg-white focus:bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
               />
 
               {/* Send Button */}
               <button
+                type="button"
                 onClick={handleSendMessage}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm flex items-center gap-1.5"
+                disabled={!inputText.trim()}
+                className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 shrink-0 ${
+                  inputText.trim()
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                }`}
               >
+                <Send className="w-3.5 h-3.5" />
                 <span>Send</span>
               </button>
             </div>
@@ -759,11 +831,11 @@ export const WhatsAppInbox: React.FC = () => {
         </div>
 
         {/* Right Column: Customer Intelligence (3 cols) */}
-        <div className="col-span-12 lg:col-span-3 space-y-4">
+        <div className="col-span-12 lg:col-span-3 h-full flex flex-col space-y-3.5 overflow-y-auto pr-0.5">
           {/* Card 1: Payment */}
-          <div className="crm-card p-5 bg-white space-y-3">
+          <div className="crm-card p-4 bg-white space-y-3 shrink-0">
             <h4 className="text-xs font-bold text-gray-900 tracking-tight uppercase">
-              Payment
+              Payment & Plan
             </h4>
 
             <div>
@@ -779,7 +851,7 @@ export const WhatsAppInbox: React.FC = () => {
             </div>
 
             {/* Propensity Progress Bar */}
-            <div className="pt-2">
+            <div className="pt-1">
               <div className="flex items-center justify-between text-[11px] font-medium text-blue-800 mb-1">
                 <span>High propensity · {currentContact.propensityScore}%</span>
               </div>
@@ -793,7 +865,7 @@ export const WhatsAppInbox: React.FC = () => {
           </div>
 
           {/* Card 2: Quick actions */}
-          <div className="crm-card p-5 bg-white space-y-2.5">
+          <div className="crm-card p-4 bg-white space-y-2.5 shrink-0">
             <h4 className="text-xs font-bold text-gray-900 tracking-tight uppercase">
               Quick actions
             </h4>
@@ -801,17 +873,40 @@ export const WhatsAppInbox: React.FC = () => {
             <div className="space-y-2 pt-1">
               <button
                 onClick={handleSendPaymentLink}
-                className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-50 transition-colors shadow-sm"
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-gray-800 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-colors shadow-2xs flex items-center justify-between"
               >
-                Send payment link
+                <span>Send payment link</span>
+                <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
               </button>
 
               <button
                 onClick={handleRecordPayment}
-                className="w-full text-left px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-50 transition-colors shadow-sm"
+                className="w-full text-left px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-gray-800 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 transition-colors shadow-2xs flex items-center justify-between"
               >
-                Record payment
+                <span>Record payment</span>
+                <DollarSign className="w-3.5 h-3.5 text-gray-400" />
               </button>
+            </div>
+          </div>
+
+          {/* Card 3: Contact overview metadata */}
+          <div className="crm-card p-4 bg-white space-y-2 shrink-0">
+            <h4 className="text-xs font-bold text-gray-900 tracking-tight uppercase">
+              Customer Overview
+            </h4>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between py-1 border-b border-gray-50">
+                <span className="text-gray-500">Phone</span>
+                <span className="font-mono font-medium text-gray-800">{currentContact.phone}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-gray-50">
+                <span className="text-gray-500">Company</span>
+                <span className="font-medium text-gray-800">{currentContact.company}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-gray-500">WhatsApp SLA</span>
+                <span className="text-emerald-600 font-semibold">Active &lt; 2 min</span>
+              </div>
             </div>
           </div>
         </div>
