@@ -81,7 +81,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-900 flex font-sans antialiased">
+    <div className="h-screen w-screen overflow-hidden bg-[#f8fafc] text-gray-900 flex font-sans antialiased">
       {/* 1. Deep Blue Left Sidebar */}
       <Sidebar
         activeView={activeView}
@@ -90,9 +90,9 @@ export default function DashboardPage() {
       />
 
       {/* 2. Main Content View Area with Seamless Aligned Top Header */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Continuous Aligned Top Header Bar (Height 80px / h-20, Seamlessly Aligned with HALOOCOM Sidebar Header) */}
-        <header className="h-20 shrink-0 bg-[#0f172a] text-white border-b border-slate-800 px-6 lg:px-8 flex items-center justify-between border-l border-slate-800 sticky top-0 z-20 shadow-xs">
+        <header className="h-20 shrink-0 bg-[#0f172a] text-white border-b border-slate-800 px-6 lg:px-8 flex items-center justify-between border-l border-slate-800 z-20 shadow-xs">
           {activeView === 'dashboard' && (
             <>
               <div className="flex items-center gap-3.5 min-w-0">
@@ -289,7 +289,7 @@ export default function DashboardPage() {
         </header>
 
         {/* View Main Content Body */}
-        <main className="flex-1 p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
           {activeView === 'dashboard' && (
             <div className="space-y-6">
               {/* 6 Metric Cards Row */}

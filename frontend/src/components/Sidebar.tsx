@@ -44,9 +44,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-white text-gray-700 flex flex-col justify-between shrink-0 select-none min-h-screen border-r border-gray-200">
+    <aside className="w-64 bg-white text-gray-700 flex flex-col justify-between shrink-0 select-none h-screen border-r border-gray-200 sticky top-0 z-30">
       {/* Brand & Software Provider Header */}
-      <div>
+      <div className="flex flex-col flex-1 min-h-0">
         <div className="h-20 px-5 border-b border-slate-800 bg-[#0f172a] text-white flex items-center shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative bg-white rounded-xl p-1.5 shadow-sm border border-slate-700 flex items-center justify-center shrink-0 w-11 h-11">
@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation list */}
-        <nav className="p-3 space-y-1 mt-2">
+        <nav className="p-3 space-y-1 mt-2 flex-1 overflow-y-auto min-h-0">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeView === item.id;
@@ -112,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* User profile & logout */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50/70">
+      <div className="p-4 border-t border-gray-100 bg-gray-50/70 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-xs">
